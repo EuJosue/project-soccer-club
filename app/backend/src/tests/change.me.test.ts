@@ -13,25 +13,35 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Testes de Integração', () => {
-  describe('Model', () => {
-    describe('TeamModel', () => {
-      describe('TeamModel.findAll', () => {
-        beforeEach(() => {
-          sinon
-            .stub(Team, "findAll")
-            .resolves(teams as unknown as Team[]);
-        });
+  describe('teams', () => {
+    describe('GET /teams', () => {
+      beforeEach(() => {
+        sinon
+          .stub(Team, "findAll")
+          .resolves(teams as unknown as Team[]);
+      });
 
-        it('Se retorna um array com todos os times', async () => {
-          const { body, status } = await chai
-            .request(app).get('/teams');
+      it('Se responde com status 200 e um array de times', async () => {
+        const { body, status } = await chai
+          .request(app).get('/teams');
 
-          expect(status).to.be.equal(200);
-          expect(body).to.be.an('array');
-          expect(body).to.be.deep.equal(teams);
-        });
+        expect(status).to.be.equal(200);
+        expect(body).to.be.an('array');
+        expect(body).to.be.deep.equal(teams);
       });
     });
+
+    describe('GET /teams/:id', async () => {
+      it('Se responde com status 200 e um time', async () => {
+        const { body, status } = await chai
+          .request(app).get('/teams/1');
+
+        expect(status).to.be.equal(200);
+        expect(body).to.be.an('object');
+        expect(body).to.be.deep.equal(teams[0]);
+      })
+    });
   });
+  
   afterEach(sinon.restore)
 });
