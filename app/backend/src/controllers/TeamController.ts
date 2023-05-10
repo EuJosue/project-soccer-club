@@ -9,4 +9,12 @@ export default class TeamController {
 
     return res.json(teams);
   }
+
+  async findByPk(req: Request, res: Response) {
+    const { id } = req.params;
+
+    const team = await this.teamService.findByPk(Number(id));
+
+    return res.json(team);
+  }
 }
