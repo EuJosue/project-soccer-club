@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import TeamService from "../models/TeamModel";
+import { Request, Response } from 'express';
+import TeamService from '../models/TeamModel';
 
 export default class TeamController {
   constructor(private teamService = new TeamService()) {}

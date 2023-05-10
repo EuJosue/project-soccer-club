@@ -1,4 +1,4 @@
-import TeamModel from "../models/TeamModel";
+import TeamModel from '../models/TeamModel';
 
 export default class TeamService {
   constructor(private teamModel = new TeamModel()) {}
