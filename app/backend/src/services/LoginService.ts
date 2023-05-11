@@ -12,8 +12,8 @@ export default class LoginService {
   async login({ email, password }: ILogin) {
     const user = await this.userModel.findByEmail({ email });
 
-    if (!user || LoginService.comparePass(password, user.password)) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'All fields must be filled');
+    if (!user || !LoginService.comparePass(password, user.password)) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid email or password');
     }
 
     return LoginService.generateToken({ id: user.id, email: user.email });
