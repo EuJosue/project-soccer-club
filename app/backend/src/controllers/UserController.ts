@@ -2,5 +2,5 @@
 import UserService from '../services/UserService';
 
 export default class TeamController {
-  constructor(private teamService = new UserService()) {}
+  constructor(private userService = new UserService()) {}
 }
