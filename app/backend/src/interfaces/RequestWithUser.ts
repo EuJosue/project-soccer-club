@@ -1,5 +1,5 @@
-import IId from './IId';
+import { Request } from 'express';
 
 export default interface RequestWithUser extends Request {
-  user: IId
+  user?: { id: number }
 }

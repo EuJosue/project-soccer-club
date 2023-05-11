@@ -19,7 +19,7 @@ export default class TeamController {
   }
 
   async findRole(req: RequestWithUser, res: Response) {
-    const { id } = req.user;
+    const { id } = req.user || { id: 0 };
 
     const user = await this._userService.findById({ id });
 
