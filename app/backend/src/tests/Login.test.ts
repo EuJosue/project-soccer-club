@@ -3,10 +3,10 @@ import * as chai from 'chai';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 
-import { app } from '../../app';
+import { app } from '../app';
 
 import { users } from './mocks/Login.mock';
-import User from '../../database/models/User';
+import User from '../database/models/User';
 
 chai.use(chaiHttp);
 
@@ -18,9 +18,9 @@ describe('login', () => {
       const { body, status } = await chai
         .request(app)
         .post('/login')
-        .send(JSON.stringify(
-          { email: 'admin@admin.com' }
-        ));
+        .send({
+          email: 'admin@admin.com'
+        });
 
       expect(status).to.be.equal(400);
       expect(body).to.be.an('object');
@@ -31,16 +31,16 @@ describe('login', () => {
       const { body, status } = await chai
         .request(app)
         .post('/login')
-        .send(JSON.stringify(
-          { password: 'secret_admin' }
-        ));
+        .send({
+          password: 'secret_admin'
+        });
 
       expect(status).to.be.equal(400);
       expect(body).to.be.an('object');
       expect(body).to.be.deep.equal({ message: 'All fields must be filled' });
     });
-    
-    it('Se passado um email inválido responde com status 401 e Unauthorized', async () => {
+
+    it('Se passado um email inválido responde com status 401 e Invalid email or password', async () => {
       sinon
         .stub(User, 'findOne')
         .resolves(null);
@@ -48,16 +48,17 @@ describe('login', () => {
       const { body, status } = await chai
         .request(app)
         .post('/login')
-        .send(JSON.stringify(
-          { email: 'adminwrongemail@admin.com', password: 'secret_admin' }
-        ));
-
+        .send({
+          email: 'adminwrongemail@admin.com',
+          password: 'secret_admin'
+        });
+          
       expect(status).to.be.equal(401);
       expect(body).to.be.an('object');
-      expect(body).to.be.deep.equal({ message: 'Unauthorized' });
+      expect(body).to.be.deep.equal({ message: 'Invalid email or password' });
     });
 
-    it('Se passado uma senha inválida responde com status 401 e Unauthorized', async () => {
+    it('Se passado uma senha inválida responde com status 401 e Invalid email or password', async () => {
       sinon
         .stub(User, 'findOne')
         .resolves(users[0] as unknown as User);
@@ -65,13 +66,14 @@ describe('login', () => {
       const { body, status } = await chai
         .request(app)
         .post('/login')
-        .send(JSON.stringify(
-          { email: 'admin@admin.com', password: 'wrong_secret_admin' }
-        ));
+        .send({
+          email: 'admin@admin.com',
+          password: 'wrong_secret_admin'
+        });
 
       expect(status).to.be.equal(401);
       expect(body).to.be.an('object');
-      expect(body).to.be.deep.equal({ message: 'Unauthorized' });
+      expect(body).to.be.deep.equal({ message: 'Invalid email or password' });
     });
 
     it('Se passado um email e senha válidos responde com status 200 e um token', async () => {
@@ -82,9 +84,10 @@ describe('login', () => {
       const { body, status } = await chai
         .request(app)
         .post('/login')
-        .send(JSON.stringify(
-          { email: 'admin@admin.com', password: 'secret_admin' }
-        ));
+        .send({
+          email: 'admin@admin.com',
+          password: 'secret_admin'
+        });
 
       expect(status).to.be.equal(200);
       expect(body).to.be.an('object');
