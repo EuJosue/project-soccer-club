@@ -1,35 +1,29 @@
 import { StatusCodes } from 'http-status-codes';
-import { hashSync, compareSync } from 'bcryptjs';
-import { sign } from 'jsonwebtoken';
-import IJwtPayload from '../interfaces/IJwtPayload';
 import ILogin from '../interfaces/ILogin';
 import ApiError from '../utils/ApiError';
 import UserModel from '../models/UserModel';
+import Auth from '../utils/Auth';
+import Crypt from '../utils/Crypt';
+import User from '../database/models/User';
 
 export default class LoginService {
-  constructor(private userModel = new UserModel()) { }
+  constructor(
+    private _userModel = new UserModel(),
+    private _auth = new Auth(),
+    private _crypt = new Crypt(),
+  ) {}
 
   async login({ email, password }: ILogin) {
-    const user = await this.userModel.findByEmail({ email });
+    const user = await this._userModel.findByEmail({ email }) as User;
 
-    if (!user || !LoginService.comparePass(password, user.password)) {
+    this._validatePassword(user, password);
+
+    return this._auth.generateToken({ id: user.id, email: user.email });
+  }
+
+  private _validatePassword(user: User | null, password: string): void {
+    if (!user || !this._crypt.compare(password, user.password)) {
       throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid email or password');
     }
-
-    return LoginService.generateToken({ id: user.id, email: user.email });
-  }
-
-  private static encryptPass(password: string) {
-    return hashSync(password);
-  }
-
-  private static comparePass(password: string, hash: string) {
-    return compareSync(password, hash);
-  }
-
-  private static generateToken(payload: IJwtPayload) {
-    const secret = process.env.JWT_SECRET || 'secret';
-
-    return sign(payload, secret, { expiresIn: '1d' });
   }
 }
