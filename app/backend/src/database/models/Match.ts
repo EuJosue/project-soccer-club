@@ -13,7 +13,6 @@ class Match extends Model {
 Match.init({
   homeTeamId: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
     allowNull: false,
   },
   homeTeamGoals: {
@@ -22,7 +21,6 @@ Match.init({
   },
   awayTeamId: {
     type: DataTypes.INTEGER,
-    primaryKey: true,
     allowNull: false,
   },
   awayTeamGoals: {
