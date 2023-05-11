@@ -1,10 +1,5 @@
-import IEmail from '../interfaces/IEmail';
 import UserModel from '../models/UserModel';
 
-export default class TeamService {
+export default class TeamModel {
   constructor(private userModel = new UserModel()) {}
-
-  async findByEmail({ email }: IEmail) {
-    return this.userModel.findByEmail({ email });
-  }
 }
