@@ -1,6 +1,8 @@
 const statusCodeObject: { [param: string]: number } = {
-  'string.min': 422,
+  'string.min': 401,
   'string.base': 422,
+  'string.empty': 400,
+  'string.email': 401,
   'number.base': 422,
   'number.min': 422,
   'array.includesRequiredUnknowns': 422,
