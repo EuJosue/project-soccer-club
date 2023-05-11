@@ -8,7 +8,6 @@ const errorHandlerFunction = (
   res: Response,
 ) => {
   const { type } = error.details[0];
-  console.log(type);
 
   return res.status(statusCode(type)).json({ message: error.message });
 };
