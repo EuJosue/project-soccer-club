@@ -13,7 +13,7 @@ export default class LoginService {
     const user = await this.userModel.findByEmail({ email });
 
     if (!user || !LoginService.comparePass(password, user.password)) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid email or password');
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid email or password');
     }
 
     return LoginService.generateToken({ id: user.id, email: user.email });
