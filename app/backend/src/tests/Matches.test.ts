@@ -198,5 +198,119 @@ describe('Matches', () => {
     });
   });
 
+  describe('POST /matches', () => {
+    it('Se não for passado um token responde com status 401 e Token not found', async () => {
+      const { body, status } = await chai
+        .request(app).post('/matches');
+
+      expect(status).to.be.equal(401);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({ message: 'Token not found' });
+    });
+
+    it('Se passado um token inválido responde com status 401 e Token must be a valid token', async () => {
+      const { body, status } = await chai
+        .request(app).post('/matches')
+        .auth('invalid_token', { type: 'bearer' });
+
+      expect(status).to.be.equal(401);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({ message: 'Token must be a valid token' });
+    });
+
+    it('Se passado um body inválido responde com status 400 e Bad request', async () => {
+      const { body, status } = await chai
+        .request(app).post('/matches')
+        .auth(token, { type: 'bearer' })
+        .send({
+          homeTeamId: 1,
+          awayTeamId: 2,
+        });
+
+      expect(status).to.be.equal(400);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({ message: 'Bad request' });
+    });
+
+    it('Se passado um body válido com gols negativos responde com status 422 e Goals must be at least 0', async () => {
+      const { body, status } = await chai
+        .request(app).post('/matches')
+        .auth(token, { type: 'bearer' })
+        .send({
+          homeTeamId: 1,
+          awayTeamId: 2,
+          homeTeamGoals: -1,
+          awayTeamGoals: -1
+        });
+
+      expect(status).to.be.equal(422);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({ message: 'Goals must be at least 0' });
+    });
+
+    it('Se passado um body válido com times iguais responde com status 422 e It is not possible to create a match with two equal teams', async () => {
+      const { body, status } = await chai
+        .request(app).post('/matches')
+        .auth(token, { type: 'bearer' })
+        .send({
+          homeTeamId: 1,
+          awayTeamId: 1,
+          homeTeamGoals: 1,
+          awayTeamGoals: 1
+        });
+
+      expect(status).to.be.equal(422);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({ message: 'It is not possible to create a match with two equal teams' });
+    });
+
+    it('Se passado um body válido com times que não existem responde com status 404 e There is no team with such id!', async () => {
+      sinon
+        .stub(Match, 'create')
+        .resolves(undefined);
+
+      const { body, status } = await chai
+        .request(app).post('/matches')
+        .auth(token, { type: 'bearer' })
+        .send({
+          homeTeamId: 3,
+          awayTeamId: 4,
+          homeTeamGoals: 1,
+          awayTeamGoals: 1
+        });
+
+      expect(status).to.be.equal(404);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({ message: 'There is no team with such id!' });
+    });
+
+    it('Se passado um body válido responde com status 201 e os dados da partida', async () => {
+      sinon
+        .stub(Match, 'create')
+        .resolves(matches[0] as unknown as Match);
+
+      const { body, status } = await chai
+        .request(app).post('/matches')
+        .auth(token, { type: 'bearer' })
+        .send({
+          homeTeamId: 1,
+          awayTeamId: 2,
+          homeTeamGoals: 1,
+          awayTeamGoals: 1
+        });
+
+      expect(status).to.be.equal(201);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({
+        id: 1,
+        inProgress: true,
+        homeTeamId: 1,
+        awayTeamId: 2,
+        homeTeamGoals: 1,
+        awayTeamGoals: 1
+      });
+    });
+  });
+
   afterEach(sinon.restore);
 });
