@@ -13,8 +13,11 @@ export default class TeamController {
     return res.json(matches);
   }
 
-  async findAllWithTeamName(_req: RequestWithUser, res: Response) {
-    const matches = await this._loginService.findAllWithTeamName();
+  async findAllWithTeamName(req: RequestWithUser, res: Response) {
+    const { inProgress } = req.query;
+
+    const matches = await this._loginService
+      .findAllWithTeamName(inProgress as string | undefined);
 
     return res.json(matches);
   }
