@@ -162,7 +162,7 @@ describe('Matches', () => {
       expect(body).to.be.deep.equal({ message: 'Match not found' });
     });
 
-    it('Se passado um id válido e um body inválido responde com status 400 e Invalid body', async () => {
+    it('Se passado um id válido e um body inválido responde com status 400 e Bad request', async () => {
       sinon
         .stub(Match, 'update')
         .resolves([1]);
@@ -177,6 +177,24 @@ describe('Matches', () => {
       expect(status).to.be.equal(400);
       expect(body).to.be.an('object');
       expect(body).to.be.deep.equal({ message: 'Bad request' });
+    });
+
+    it('Se passado um id válido e um body válido com gols negativos responde com status 422 e Goals must be at least 0', async () => {
+      sinon
+        .stub(Match, 'update')
+        .resolves([1]);
+
+      const { body, status } = await chai
+        .request(app).patch('/matches/1')
+        .auth(token, { type: 'bearer' })
+        .send({
+          homeTeamGoals: -1,
+          awayTeamGoals: -1
+        });
+
+      expect(status).to.be.equal(422);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({ message: 'Goals must be at least 0' });
     });
   });
 
