@@ -28,10 +28,16 @@ export default class MatchService {
   }
 
   async create(match: IMatch) {
-    const [newMatch, created] = await this._matchModel.findOrCreate(match);
+    try {
+      const [newMatch, created] = await this._matchModel.findOrCreate(match);
 
-    if (!created) throw new ApiError(StatusCodes.CONFLICT, 'Match already exists');
+      if (!created) throw new ApiError(StatusCodes.CONFLICT, 'Match already exists');
 
-    return newMatch;
+      return newMatch;
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+
+      throw new ApiError(StatusCodes.NOT_FOUND, 'There is no team with such id!');
+    }
   }
 }

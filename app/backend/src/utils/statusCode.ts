@@ -8,6 +8,7 @@ const statusCodeObject: { [param: string]: number } = {
   'array.includesRequiredUnknowns': 422,
   'array.base': 422,
   'any.required': 400,
+  'any.invalid': 422,
 };
 
 export default (type: string) => statusCodeObject[type] || 500;
