@@ -14,11 +14,15 @@ export default class MatchService {
     return this._matchModel.findAllWithTeamNameInProgress(inProgress === 'true');
   }
 
-  async finishMatch(id: number) { return this._matchModel.finishMatch(id); }
+  async finishMatch(id: number) {
+    const [affectedRows] = await this._matchModel.finishMatch(id);
+
+    if (affectedRows < 1) throw new ApiError(StatusCodes.NOT_FOUND, 'Match not found');
+  }
 
   async update(id: number, changes: MatchUpdate) {
     const [affectedRows] = await this._matchModel.update(id, changes);
 
-    if (!affectedRows) throw new ApiError(StatusCodes.NOT_FOUND, 'Match not found');
+    if (affectedRows < 1) throw new ApiError(StatusCodes.NOT_FOUND, 'Match not found');
   }
 }
