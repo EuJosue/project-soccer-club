@@ -12,7 +12,7 @@ chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('teams', () => {
+describe('Teams', () => {
   describe('GET /teams', () => {
     beforeEach(() => {
       sinon

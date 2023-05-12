@@ -13,7 +13,7 @@ chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('login', () => {
+describe('Login', () => {
   describe('POST /login', async () => {
     it('Se não for passado uma senha responde com status 400 e All fields must be filled', async () => {
       const { body, status } = await chai
