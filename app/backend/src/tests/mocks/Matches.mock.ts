@@ -62,3 +62,12 @@ export const matchesNotInProgress = [
     }
   },
 ]
+
+export const justMatch = {
+  id: 1,
+  homeTeamId: 1,
+  awayTeamId: 2,
+  homeTeamGoals: 1,
+  awayTeamGoals: 1,
+  inProgress: true,
+}

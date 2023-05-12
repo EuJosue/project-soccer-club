@@ -4,7 +4,7 @@ import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-import { matches, matchesInProgress, matchesNotInProgress } from './mocks/Matches.mock';
+import { justMatch, matches, matchesInProgress, matchesNotInProgress } from './mocks/Matches.mock';
 import Match from '../database/models/Match';
 import Auth from '../utils/Auth';
 
@@ -258,7 +258,8 @@ describe('Matches', () => {
           homeTeamGoals: 1,
           awayTeamGoals: 1
         });
-
+      console.log(body);
+      
       expect(status).to.be.equal(422);
       expect(body).to.be.an('object');
       expect(body).to.be.deep.equal({ message: 'It is not possible to create a match with two equal teams' });
@@ -266,7 +267,7 @@ describe('Matches', () => {
 
     it('Se passado um body válido com times que não existem responde com status 404 e There is no team with such id!', async () => {
       sinon
-        .stub(Match, 'create')
+        .stub(Match, 'findOrCreate')
         .resolves(undefined);
 
       const { body, status } = await chai
@@ -286,8 +287,8 @@ describe('Matches', () => {
 
     it('Se passado um body válido responde com status 201 e os dados da partida', async () => {
       sinon
-        .stub(Match, 'create')
-        .resolves(matches[0] as unknown as Match);
+        .stub(Match, 'findOrCreate')
+        .resolves([justMatch as unknown as Match, true]);
 
       const { body, status } = await chai
         .request(app).post('/matches')
