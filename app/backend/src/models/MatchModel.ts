@@ -1,8 +1,9 @@
+import IMatch from '../interfaces/IMatch';
 import MatchUpdate from '../interfaces/MatchUpdate';
 import Match from '../database/models/Match';
 
 export default class MatchModel {
-  constructor(private _db = Match) {}
+  constructor(private _db = Match) { }
 
   async findAll() { return this._db.findAll(); }
 
@@ -21,5 +22,12 @@ export default class MatchModel {
       changes,
       { where: { id, inProgress: true } },
     );
+  }
+
+  async findOrCreate(match: IMatch) {
+    return this._db.findOrCreate({
+      where: { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId, inProgress: true },
+      defaults: { ...match },
+    });
   }
 }
