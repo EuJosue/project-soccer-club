@@ -38,4 +38,12 @@ export default class TeamController {
 
     return res.json({ message: 'Updated' });
   }
+
+  async create(req: RequestWithUser, res: Response) {
+    const match = req.body;
+
+    const newMatch = await this._loginService.create(match);
+
+    return res.status(201).json(newMatch);
+  }
 }
