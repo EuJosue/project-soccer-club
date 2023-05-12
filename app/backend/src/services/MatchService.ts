@@ -10,4 +10,6 @@ export default class MatchService {
 
     return this._matchModel.findAllWithTeamNameInProgress(inProgress === 'true');
   }
+
+  async finishMatch(id: number) { return this._matchModel.finishMatch(id); }
 }
