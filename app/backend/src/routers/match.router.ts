@@ -9,4 +9,6 @@ router.get('/', (req, res) => matchController.findAllWithTeamName(req, res));
 
 router.patch('/:id/finish', validateToken, (req, res) => matchController.finishMatch(req, res));
 
+router.patch('/:id', validateToken, (req, res) => matchController.update(req, res));
+
 export default router;
