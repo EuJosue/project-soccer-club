@@ -1,3 +1,4 @@
+import MatchUpdate from '../interfaces/MatchUpdate';
 import Match from '../database/models/Match';
 
 export default class MatchModel {
@@ -13,5 +14,12 @@ export default class MatchModel {
 
   async finishMatch(id: number) {
     return this._db.update({ inProgress: false }, { where: { id } });
+  }
+
+  async update(id: number, changes: MatchUpdate) {
+    return this._db.update(
+      changes,
+      { where: { id, inProgress: true } },
+    );
   }
 }
