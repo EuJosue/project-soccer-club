@@ -21,4 +21,12 @@ export default class TeamController {
 
     return res.json(matches);
   }
+
+  async finishMatch(req: RequestWithUser, res: Response) {
+    const { id } = req.params;
+
+    await this._loginService.finishMatch(Number(id));
+
+    return res.json({ message: 'Finished' });
+  }
 }
