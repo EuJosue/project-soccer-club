@@ -10,4 +10,8 @@ export default class MatchModel {
   async findAllWithTeamNameInProgress(inProgress: boolean) {
     return this._db.scope('withTeamName').findAll({ where: { inProgress } });
   }
+
+  async finishMatch(id: number) {
+    return this._db.update({ inProgress: false }, { where: { id } });
+  }
 }
