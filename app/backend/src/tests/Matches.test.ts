@@ -53,5 +53,33 @@ describe('Matches', () => {
     });
   });
 
+  describe('PATCH /matches/:id/finish', () => {
+    it('Se passado um id válido responde com status 200 e a partida atualizada', async () => {
+      sinon
+        .stub(Match, 'update')
+        .resolves([1]);
+
+      const { body, status } = await chai
+        .request(app).patch('/matches/1/finish');
+
+      expect(status).to.be.equal(200);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({ message: 'Finished' });
+    });
+
+    it('Se passado um id inválido responde com status 404 e Match not found', async () => {
+      sinon
+        .stub(Match, 'update')
+        .resolves([0]);
+
+      const { body, status } = await chai
+        .request(app).patch('/matches/3/finish');
+
+      expect(status).to.be.equal(404);
+      expect(body).to.be.an('object');
+      expect(body).to.be.deep.equal({ message: 'Match not found' });
+    });
+  });
+
   afterEach(sinon.restore);
 });
