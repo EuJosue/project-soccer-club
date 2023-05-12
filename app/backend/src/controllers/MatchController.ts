@@ -29,4 +29,13 @@ export default class TeamController {
 
     return res.json({ message: 'Finished' });
   }
+
+  async update(req: RequestWithUser, res: Response) {
+    const { id } = req.params;
+    const changes = req.body;
+
+    await this._loginService.update(Number(id), changes);
+
+    return res.json({ message: 'Updated' });
+  }
 }
