@@ -4,7 +4,7 @@ import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-import { justMatch, matches, matchesInProgress, matchesNotInProgress } from './mocks/Matches.mock';
+import { justMatch, leaderboard, matches, matchesInProgress, matchesNotInProgress, matchsForLeaderboard } from './mocks/Matches.mock';
 import Match from '../database/models/Match';
 import Auth from '../utils/Auth';
 
@@ -17,7 +17,7 @@ describe('Matches', () => {
   const token = auth.generateToken({ id: 1, email: 'admin@admin.com' });
 
   describe('GET /matches', () => {
-    it('Se quando chamado sem inProgress responde com status 200 e um array com todas as partidas', async () => {
+    it('Se chamado sem inProgress responde com status 200 e um array com todas as partidas', async () => {
       sinon
         .stub(Match, 'findAll')
         .resolves(matches as unknown as Match[]);
@@ -30,7 +30,7 @@ describe('Matches', () => {
       expect(body).to.be.deep.equal(matches);
     });
 
-    it('Se quando chamado com inProgress true responde com status 200 e um array com as partidas em progresso', async () => {
+    it('Se chamado com inProgress igual a true responde com status 200 e um array com as partidas em progresso', async () => {
       sinon
         .stub(Match, 'findAll')
         .resolves(matchesInProgress as unknown as Match[]);
@@ -43,7 +43,7 @@ describe('Matches', () => {
       expect(body).to.be.deep.equal(matchesInProgress);
     });
 
-    it('Se quando chamado com inProgress false responde com status 200 e um array com as partidas em progresso', async () => {
+    it('Se chamado com inProgress igual a false responde com status 200 e um array com as partidas em progresso', async () => {
       sinon
         .stub(Match, 'findAll')
         .resolves(matchesNotInProgress as unknown as Match[]);
@@ -259,7 +259,7 @@ describe('Matches', () => {
           awayTeamGoals: 1
         });
       console.log(body);
-      
+
       expect(status).to.be.equal(422);
       expect(body).to.be.an('object');
       expect(body).to.be.deep.equal({ message: 'It is not possible to create a match with two equal teams' });
@@ -310,6 +310,21 @@ describe('Matches', () => {
         homeTeamGoals: 1,
         awayTeamGoals: 1
       });
+    });
+  });
+
+  describe('GET /leaderboard/home', () => {
+    it('Se response com status 200 e um array no formato correto', async () => {
+      sinon
+        .stub(Match, 'findAll')
+        .resolves(matchsForLeaderboard as unknown as Match[]);
+
+      const { body, status } = await chai
+        .request(app).get('/leaderboard/home');
+
+      expect(status).to.be.equal(200);
+      expect(body).to.be.an('array');
+      expect(body).to.be.deep.equal(leaderboard);
     });
   });
 
