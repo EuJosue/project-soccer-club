@@ -4,7 +4,14 @@ import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-import { justMatch, leaderboard, matches, matchesInProgress, matchesNotInProgress, matchsForLeaderboard } from './mocks/Matches.mock';
+import {
+  justMatch,
+  leaderboardHome,
+  matches,
+  matchesInProgress,
+  matchesNotInProgress,
+  matchsForLeaderboard,
+} from './mocks/Matches.mock';
 import Match from '../database/models/Match';
 import Auth from '../utils/Auth';
 
@@ -324,7 +331,7 @@ describe('Matches', () => {
 
       expect(status).to.be.equal(200);
       expect(body).to.be.an('array');
-      expect(body).to.be.deep.equal(leaderboard);
+      expect(body).to.be.deep.equal(leaderboardHome);
     });
   });
 
