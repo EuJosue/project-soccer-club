@@ -34,6 +34,14 @@ export default class LeaderboardService {
     return LeaderboardService.sortLeaderboard(Object.values(totalGames));
   }
 
+  async findAllAway(): Promise<ITeamWithStatus[]> {
+    const matches = await this._MatchModel.findAllWithTeamNameInProgress(false);
+
+    const totalGames = matches.reduce(LeaderboardService.countAwayGames, {});
+
+    return LeaderboardService.sortLeaderboard(Object.values(totalGames));
+  }
+
   private static sortLeaderboard(leaderboard: ITeamWithStatus[]) {
     return leaderboard.sort((a, b) => {
       const totalPoints = b.totalPoints - a.totalPoints;
@@ -47,6 +55,21 @@ export default class LeaderboardService {
 
       return b.goalsFavor - a.goalsFavor;
     });
+  }
+
+  private static countAwayGames(
+    matchesObj: { [key: string]: ITeamWithStatus },
+    match: IMatchWithTeam,
+  ) {
+    const newMatchesObj = { ...matchesObj };
+    const [, awayTeam] = LeaderboardService.matchToTeam(match, [
+      matchesObj[match.homeTeam.teamName],
+      matchesObj[match.awayTeam.teamName],
+    ]);
+
+    newMatchesObj[awayTeam.name] = awayTeam;
+
+    return newMatchesObj;
   }
 
   private static countHomeGames(
