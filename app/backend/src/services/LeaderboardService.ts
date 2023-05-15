@@ -12,6 +12,8 @@ export default class LeaderboardService {
     totalLosses: 0,
     goalsFavor: 0,
     goalsOwn: 0,
+    goalsBalance: 0,
+    efficiency: 0,
   };
 
   constructor(private _MatchModel = new MatchModel()) {}
@@ -21,7 +23,45 @@ export default class LeaderboardService {
 
     const totalGames = matches.reduce(LeaderboardService.countGames, {});
 
-    return Object.values(totalGames).sort((a, b) => b.totalPoints - a.totalPoints);
+    return LeaderboardService.sortLeaderboard(Object.values(totalGames));
+  }
+
+  async findAllHome(): Promise<ITeamWithStatus[]> {
+    const matches = await this._MatchModel.findAllWithTeamNameInProgress(false);
+
+    const totalGames = matches.reduce(LeaderboardService.countHomeGames, {});
+
+    return LeaderboardService.sortLeaderboard(Object.values(totalGames));
+  }
+
+  private static sortLeaderboard(leaderboard: ITeamWithStatus[]) {
+    return leaderboard.sort((a, b) => {
+      const totalPoints = b.totalPoints - a.totalPoints;
+      if (totalPoints !== 0) return totalPoints;
+
+      const totalVictory = b.totalVictories - a.totalVictories;
+      if (totalVictory !== 0) return totalVictory;
+
+      const goalsBalance = b.goalsBalance - a.goalsBalance;
+      if (goalsBalance !== 0) return goalsBalance;
+
+      return b.goalsFavor - a.goalsFavor;
+    });
+  }
+
+  private static countHomeGames(
+    matchesObj: { [key: string]: ITeamWithStatus },
+    match: IMatchWithTeam,
+  ) {
+    const newMatchesObj = { ...matchesObj };
+    const [homeTeam] = LeaderboardService.matchToTeam(match, [
+      matchesObj[match.homeTeam.teamName],
+      matchesObj[match.awayTeam.teamName],
+    ]);
+
+    newMatchesObj[homeTeam.name] = homeTeam;
+
+    return newMatchesObj;
   }
 
   private static countGames(
@@ -72,16 +112,19 @@ export default class LeaderboardService {
     goalsOwn: number,
   }, oldTeam: ITeamWithStatus): ITeamWithStatus {
     const pointsEarned = LeaderboardService.pointsEarned(team.goalsFavor, team.goalsOwn);
+    const totalGames = oldTeam.totalGames + 1;
+    const totalPoints = oldTeam.totalPoints + pointsEarned;
+    const efficiencySum = ((totalPoints / (totalGames * 3)) * 100);
 
-    return {
-      name: team.name,
-      totalPoints: oldTeam.totalPoints + pointsEarned,
-      totalGames: oldTeam.totalGames + 1,
+    return { name: team.name,
+      totalPoints,
+      totalGames,
       totalVictories: oldTeam.totalVictories + (pointsEarned === 3 ? 1 : 0),
       totalDraws: oldTeam.totalDraws + (pointsEarned === 1 ? 1 : 0),
       totalLosses: oldTeam.totalLosses + (pointsEarned === 0 ? 1 : 0),
       goalsFavor: oldTeam.goalsFavor + team.goalsFavor,
       goalsOwn: oldTeam.goalsOwn + team.goalsOwn,
-    };
+      goalsBalance: oldTeam.goalsBalance + (team.goalsFavor - team.goalsOwn),
+      efficiency: Number(efficiencySum.toFixed(2)) };
   }
 }
