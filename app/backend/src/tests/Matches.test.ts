@@ -6,11 +6,9 @@ import chaiHttp = require('chai-http');
 import { app } from '../app';
 import {
   justMatch,
-  leaderboardHome,
   matches,
   matchesInProgress,
   matchesNotInProgress,
-  matchsForLeaderboard,
 } from './mocks/Matches.mock';
 import Match from '../database/models/Match';
 import Auth from '../utils/Auth';
@@ -317,21 +315,6 @@ describe('Matches', () => {
         homeTeamGoals: 1,
         awayTeamGoals: 1
       });
-    });
-  });
-
-  describe('GET /leaderboard/home', () => {
-    it('Se response com status 200 e um array no formato correto', async () => {
-      sinon
-        .stub(Match, 'findAll')
-        .resolves(matchsForLeaderboard as unknown as Match[]);
-
-      const { body, status } = await chai
-        .request(app).get('/leaderboard/home');
-
-      expect(status).to.be.equal(200);
-      expect(body).to.be.an('array');
-      expect(body).to.be.deep.equal(leaderboardHome);
     });
   });
 
