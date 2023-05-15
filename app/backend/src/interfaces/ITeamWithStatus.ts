@@ -7,6 +7,8 @@ export default interface ITeamWithStatus {
   totalLosses: number,
   goalsFavor: number,
   goalsOwn: number,
+  goalsBalance: number,
+  efficiency: number,
 }
 
 export type HomeTeam = ITeamWithStatus;
